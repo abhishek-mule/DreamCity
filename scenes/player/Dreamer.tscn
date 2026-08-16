@@ -1,0 +1,31 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/player/DreamerController.gd" id="1_ctrl"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_dreamer"]
+radius = 0.4
+height = 1.8
+
+[sub_resource type="StandardMaterial3D" id="Material_dreamer"]
+albedo_color = Color(0.72, 0.8, 1, 1)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_dreamer"]
+material = SubResource("Material_dreamer")
+radius = 0.4
+height = 1.8
+radial_segments = 10
+rings = 5
+
+[node name="Dreamer" type="CharacterBody3D"]
+script = ExtResource("1_ctrl")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("CapsuleShape3D_dreamer")
+
+[node name="Visual" type="Node3D" parent="."]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Visual"]
+mesh = SubResource("CapsuleMesh_dreamer")
+
+[node name="CameraTarget" type="Node3D" parent="."]
+position = Vector3(0, 1.2, 0)
