@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://beyq2sun6nkx3"]
+[gd_scene load_steps=11 format=3 uid="uid://beyq2sun6nkx3"]
 
 [ext_resource type="Script" uid="uid://qhd4po88f3g2" path="res://scripts/core/GameManager.gd" id="1_script"]
 [ext_resource type="Environment" path="res://resources/night_environment.tres" id="2_env"]
@@ -8,6 +8,8 @@
 [ext_resource type="Script" path="res://scripts/timing/TimingSystem.gd" id="6_timing"]
 [ext_resource type="PackedScene" path="res://scenes/ui/TimingUI.tscn" id="7_timing_ui"]
 [ext_resource type="Script" path="res://scripts/world/HypnagogicFracture.gd" id="8_fracture"]
+[ext_resource type="Script" path="res://scripts/visual/VisualEnvironment.gd" id="9_visual_env"]
+[ext_resource type="Script" path="res://scripts/visual/CameraFollow.gd" id="10_cam_follow"]
 
 [node name="Main" type="Node3D"]
 script = ExtResource("1_script")
@@ -22,6 +24,7 @@ light_energy = 0.8
 shadow_enabled = true
 
 [node name="Camera3D" type="Camera3D" parent="."]
+script = ExtResource("10_cam_follow")
 transform = Transform3D(1, 0, 0, 0, 0.978148, 0.207912, 0, -0.207912, 0.978148, 1, -1.5, 18)
 fov = 55.0
 near = 0.1
@@ -35,7 +38,12 @@ far = 200.0
 
 [node name="Background" type="Node3D" parent="World"]
 
+[node name="Midground" type="Node3D" parent="World"]
+
 [node name="VFX" type="Node3D" parent="World"]
+
+[node name="VisualEnvironment" type="Node3D" parent="World"]
+script = ExtResource("9_visual_env")
 
 [node name="PlayerRoot" type="Node3D" parent="."]
 
