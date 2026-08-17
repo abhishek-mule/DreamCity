@@ -1,8 +1,10 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scripts/core/GameManager.gd" id="1_script"]
 [ext_resource type="Environment" path="res://resources/night_environment.tres" id="2_env"]
 [ext_resource type="PackedScene" path="res://scenes/player/Dreamer.tscn" id="3_dreamer"]
+[ext_resource type="PackedScene" path="res://scenes/world/Platform.tscn" id="4_platform"]
+[ext_resource type="Script" path="res://scripts/world/PlatformRoute.gd" id="5_route"]
 
 [node name="Main" type="Node3D"]
 script = ExtResource("1_script")
@@ -18,7 +20,7 @@ shadow_enabled = true
 directional_shadow_max_distance = 100.0
 
 [node name="Camera3D" type="Camera3D" parent="."]
-position = Vector3(0, -1.5, 14)
+position = Vector3(1, -1.5, 18)
 rotation_degrees = Vector3(-12, 0, 0)
 fov = 55.0
 near = 0.1
@@ -40,5 +42,22 @@ far = 200.0
 position = Vector3(0, 1, 0)
 
 [node name="PlatformsRoot" type="Node3D" parent="."]
+script = ExtResource("5_route")
+debug_mode = true
+
+[node name="Platform1" parent="PlatformsRoot" instance=ExtResource("4_platform")]
+position = Vector3(0, -0.2, 0)
+
+[node name="Platform2" parent="PlatformsRoot" instance=ExtResource("4_platform")]
+position = Vector3(4, -0.2, 0)
+
+[node name="Platform3" parent="PlatformsRoot" instance=ExtResource("4_platform")]
+position = Vector3(8, 0.1, 0)
+
+[node name="Platform4" parent="PlatformsRoot" instance=ExtResource("4_platform")]
+position = Vector3(12, 0.1, 0)
+
+[node name="Platform5" parent="PlatformsRoot" instance=ExtResource("4_platform")]
+position = Vector3(16, -0.2, 0)
 
 [node name="UI" type="CanvasLayer" parent="."]
