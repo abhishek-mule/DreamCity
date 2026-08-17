@@ -1,12 +1,13 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=9 format=3 uid="uid://beyq2sun6nkx3"]
 
-[ext_resource type="Script" path="res://scripts/core/GameManager.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://qhd4po88f3g2" path="res://scripts/core/GameManager.gd" id="1_script"]
 [ext_resource type="Environment" path="res://resources/night_environment.tres" id="2_env"]
 [ext_resource type="PackedScene" path="res://scenes/player/Dreamer.tscn" id="3_dreamer"]
 [ext_resource type="PackedScene" path="res://scenes/world/Platform.tscn" id="4_platform"]
-[ext_resource type="Script" path="res://scripts/world/PlatformRoute.gd" id="5_route"]
+[ext_resource type="Script" uid="uid://dx3jhqoaaf3je" path="res://scripts/world/PlatformRoute.gd" id="5_route"]
 [ext_resource type="Script" path="res://scripts/timing/TimingSystem.gd" id="6_timing"]
 [ext_resource type="PackedScene" path="res://scenes/ui/TimingUI.tscn" id="7_timing_ui"]
+[ext_resource type="Script" path="res://scripts/world/HypnagogicFracture.gd" id="8_fracture"]
 
 [node name="Main" type="Node3D"]
 script = ExtResource("1_script")
@@ -15,15 +16,13 @@ script = ExtResource("1_script")
 environment = ExtResource("2_env")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-rotation_degrees = Vector3(-50, -35, 0)
+transform = Transform3D(0.819152, 0.439385, -0.368688, 0, 0.642788, 0.766044, 0.573576, -0.627507, 0.526541, 0, 0, 0)
 light_color = Color(0.6, 0.7, 1, 1)
 light_energy = 0.8
 shadow_enabled = true
-directional_shadow_max_distance = 100.0
 
 [node name="Camera3D" type="Camera3D" parent="."]
-position = Vector3(1, -1.5, 18)
-rotation_degrees = Vector3(-12, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 0.978148, 0.207912, 0, -0.207912, 0.978148, 1, -1.5, 18)
 fov = 55.0
 near = 0.1
 far = 200.0
@@ -41,30 +40,35 @@ far = 200.0
 [node name="PlayerRoot" type="Node3D" parent="."]
 
 [node name="Dreamer" parent="PlayerRoot" instance=ExtResource("3_dreamer")]
-position = Vector3(0, 1, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 
 [node name="PlatformsRoot" type="Node3D" parent="."]
 script = ExtResource("5_route")
 debug_mode = true
 
 [node name="Platform1" parent="PlatformsRoot" instance=ExtResource("4_platform")]
-position = Vector3(0, -0.2, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.2, 0)
 
 [node name="Platform2" parent="PlatformsRoot" instance=ExtResource("4_platform")]
-position = Vector3(4, -0.2, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, -0.2, 0)
 
 [node name="Platform3" parent="PlatformsRoot" instance=ExtResource("4_platform")]
-position = Vector3(8, 0.1, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0.1, 0)
 
 [node name="Platform4" parent="PlatformsRoot" instance=ExtResource("4_platform")]
-position = Vector3(12, 0.1, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0.1, 0)
 
 [node name="Platform5" parent="PlatformsRoot" instance=ExtResource("4_platform")]
-position = Vector3(16, -0.2, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, -0.2, 0)
 
 [node name="TimingSystem" type="Node" parent="."]
 script = ExtResource("6_timing")
 
+[node name="HypnagogicFracture" type="Node" parent="."]
+script = ExtResource("8_fracture")
+
 [node name="UI" type="CanvasLayer" parent="."]
 
 [node name="TimingUI" parent="UI" instance=ExtResource("7_timing_ui")]
+
+[connection signal="timing_result" from="TimingSystem" to="HypnagogicFracture" method="_on_timing_result"]

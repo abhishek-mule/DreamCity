@@ -22,6 +22,10 @@ var _was_airborne := false
 var _dead := false
 
 
+func _ready() -> void:
+	add_to_group("player")
+
+
 func set_game_state(state: int) -> void:
 	_game_state = state
 

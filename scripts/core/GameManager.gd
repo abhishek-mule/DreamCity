@@ -7,7 +7,7 @@ enum GameState {
 	GAME_OVER
 }
 
-var current_state: GameState = GameState.MENU
+var current_state: GameState = GameState.PLAYING
 
 
 func _ready() -> void:
