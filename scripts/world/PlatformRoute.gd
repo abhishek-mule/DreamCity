@@ -12,7 +12,7 @@ func _ready() -> void:
 	var gravity := 22.0
 	if player != null:
 		run_speed = player.run_speed
-		jump_velocity = player.jump_velocity
+		jump_velocity = player.good_jump_velocity
 		gravity = player.gravity
 	var platforms := get_children().filter(func(child): return child is Platform)
 	for i in platforms.size():
