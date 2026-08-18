@@ -35,9 +35,26 @@ func _on_timing_result(result: TimingSystem.TimingResult) -> void:
 	if state != FractureState.IDLE:
 		return
 	var game_manager := get_parent() as GameManager
-	if game_manager != null and game_manager.current_state == GameManager.GameState.GAME_OVER:
+	if game_manager != null and game_manager.current_state != RunState.State.PLAYING:
 		return
 	_fracture()
+
+
+func reset() -> void:
+	if _fold_tween != null and _fold_tween.is_valid():
+		_fold_tween.kill()
+	if _unfold_tween != null and _unfold_tween.is_valid():
+		_unfold_tween.kill()
+	_fold_tween = null
+	_unfold_tween = null
+	state = FractureState.IDLE
+	fracture_count = 0
+	last_pattern_name = "STANDARD"
+	_rng.seed = random_seed
+	for node in get_tree().get_nodes_in_group("platform"):
+		var visual := node.get_node_or_null("Visual")
+		if visual != null:
+			visual.rotation_degrees = Vector3.ZERO
 
 
 func _fracture() -> void:

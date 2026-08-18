@@ -18,6 +18,7 @@ signal timing_result(result: TimingResult)
 @export var debug_mode := false
 
 var current_position: float = 0.5
+var accepting_input := true
 
 const EPSILON := 0.000001
 
@@ -28,8 +29,13 @@ func _process(delta: float) -> void:
 	_t += delta / cycle_duration
 	_t = fmod(_t, 1.0)
 	current_position = _triangle(_t)
-	if Input.is_action_just_pressed("jump"):
+	if accepting_input and Input.is_action_just_pressed("jump"):
 		_handle_tap()
+
+
+func reset() -> void:
+	_t = 0.25
+	current_position = 0.5
 
 
 func classify(position: float) -> TimingResult:

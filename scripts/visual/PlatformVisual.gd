@@ -18,10 +18,23 @@ var accent: Node3D
 var _body_material: StandardMaterial3D
 var _pulse_tween: Tween
 var _pulsing := false
+var _flow_boost := 0.0
 
 
 func _ready() -> void:
 	_build()
+
+
+func set_flow_level(flow: int) -> void:
+	match flow:
+		FlowSystem.Flow.FLOW:
+			_flow_boost = 0.06
+		FlowSystem.Flow.DEEP_FLOW:
+			_flow_boost = 0.12
+		_:
+			_flow_boost = 0.0
+	if _body_material != null and (_pulse_tween == null or not _pulse_tween.is_valid()):
+		_body_material.emission_energy_multiplier = BASE_EMISSION_MULTIPLIER + _flow_boost
 
 
 func apply_variant() -> void:
@@ -76,6 +89,7 @@ func _build() -> void:
 
 func _clear_visual() -> void:
 	for child in get_children():
+		remove_child(child)
 		child.queue_free()
 	body_mesh = null
 	outline_mesh = null
@@ -203,7 +217,7 @@ func _restore() -> void:
 	if _pulse_tween != null and _pulse_tween.is_valid():
 		_pulse_tween.kill()
 	_pulse_tween = create_tween().set_parallel(true)
-	_pulse_tween.tween_property(_body_material, "emission_energy_multiplier", BASE_EMISSION_MULTIPLIER, 0.35) \
+	_pulse_tween.tween_property(_body_material, "emission_energy_multiplier", BASE_EMISSION_MULTIPLIER + _flow_boost, 0.35) \
 		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	_pulse_tween.tween_property(self, "scale", Vector3.ONE, 0.35) \
 		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)

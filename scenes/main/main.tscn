@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://beyq2sun6nkx3"]
+[gd_scene load_steps=19 format=3 uid="uid://beyq2sun6nkx3"]
 
 [ext_resource type="Script" uid="uid://qhd4po88f3g2" path="res://scripts/core/GameManager.gd" id="1_script"]
 [ext_resource type="Environment" path="res://resources/night_environment.tres" id="2_env"]
@@ -8,8 +8,16 @@
 [ext_resource type="Script" path="res://scripts/timing/TimingSystem.gd" id="6_timing"]
 [ext_resource type="PackedScene" path="res://scenes/ui/TimingUI.tscn" id="7_timing_ui"]
 [ext_resource type="Script" path="res://scripts/world/HypnagogicFracture.gd" id="8_fracture"]
-[ext_resource type="Script" path="res://scripts/visual/VisualEnvironment.gd" id="9_visual_env"]
-[ext_resource type="Script" path="res://scripts/visual/CameraFollow.gd" id="10_cam_follow"]
+[ext_resource type="Script" uid="uid://befsuts7x4fih" path="res://scripts/visual/VisualEnvironment.gd" id="9_visual_env"]
+[ext_resource type="Script" uid="uid://tlih56i0c775" path="res://scripts/visual/CameraFollow.gd" id="10_cam_follow"]
+[ext_resource type="Script" path="res://scripts/core/ScoreSystem.gd" id="11_score"]
+[ext_resource type="Script" path="res://scripts/core/FlowSystem.gd" id="12_flow"]
+[ext_resource type="Script" path="res://scripts/core/BestScores.gd" id="13_best"]
+[ext_resource type="Script" path="res://scripts/core/AudioFeedback.gd" id="14_audio"]
+[ext_resource type="Script" path="res://scripts/ui/HudController.gd" id="15_hud"]
+[ext_resource type="Script" path="res://scripts/ui/FeedbackController.gd" id="16_feedback"]
+[ext_resource type="Script" path="res://scripts/ui/ResultScreen.gd" id="17_result"]
+[ext_resource type="Script" path="res://scripts/ui/MenuOverlay.gd" id="18_menu"]
 
 [node name="Main" type="Node3D"]
 script = ExtResource("1_script")
@@ -24,11 +32,11 @@ light_energy = 0.8
 shadow_enabled = true
 
 [node name="Camera3D" type="Camera3D" parent="."]
-script = ExtResource("10_cam_follow")
 transform = Transform3D(1, 0, 0, 0, 0.978148, 0.207912, 0, -0.207912, 0.978148, 1, -1.5, 18)
 fov = 55.0
 near = 0.1
 far = 200.0
+script = ExtResource("10_cam_follow")
 
 [node name="World" type="Node3D" parent="."]
 
@@ -75,8 +83,50 @@ script = ExtResource("6_timing")
 [node name="HypnagogicFracture" type="Node" parent="."]
 script = ExtResource("8_fracture")
 
+[node name="ScoreSystem" type="Node" parent="."]
+script = ExtResource("11_score")
+
+[node name="FlowSystem" type="Node" parent="."]
+script = ExtResource("12_flow")
+
+[node name="BestScores" type="Node" parent="."]
+script = ExtResource("13_best")
+
+[node name="AudioFeedback" type="Node" parent="."]
+script = ExtResource("14_audio")
+
 [node name="UI" type="CanvasLayer" parent="."]
 
 [node name="TimingUI" parent="UI" instance=ExtResource("7_timing_ui")]
+
+[node name="Hud" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+script = ExtResource("15_hud")
+
+[node name="Feedback" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+script = ExtResource("16_feedback")
+
+[node name="ResultScreen" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("17_result")
+
+[node name="MenuOverlay" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("18_menu")
 
 [connection signal="timing_result" from="TimingSystem" to="HypnagogicFracture" method="_on_timing_result"]

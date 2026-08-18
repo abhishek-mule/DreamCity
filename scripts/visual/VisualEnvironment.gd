@@ -18,6 +18,13 @@ var _midground: Node3D
 
 var _paper_texture: NoiseTexture2D
 
+var _env: Environment
+var _env_glow_base := 0.6
+var _env_ambient_base := 0.28
+var _trail: CPUParticles3D
+var _ambient: CPUParticles3D
+var _rim_material: StandardMaterial3D
+
 
 func _ready() -> void:
 	_environment = get_node_or_null("../../WorldEnvironment") as WorldEnvironment
@@ -29,6 +36,8 @@ func _ready() -> void:
 		_build_background()
 	if build_midground and _midground != null:
 		_build_midground()
+	_setup_trail()
+	_setup_ambient()
 	call_deferred("_assign_platform_variants")
 
 
@@ -43,6 +52,111 @@ func _process(_delta: float) -> void:
 		_background.position.x = cam_x - BG_PARALLAX * player_x
 	if _midground != null:
 		_midground.position.x = cam_x - MG_PARALLAX * player_x
+	if _ambient != null and camera != null:
+		_ambient.global_position = (camera as Camera3D).global_position + Vector3(0, 0, 2)
+
+
+func on_flow_changed(flow: int) -> void:
+	_apply_flow(flow)
+
+
+func reset_run() -> void:
+	_apply_flow(FlowSystem.Flow.CALM)
+
+
+func _apply_flow(flow: int) -> void:
+	if _trail != null:
+		_trail.emitting = flow == FlowSystem.Flow.FLOW or flow == FlowSystem.Flow.DEEP_FLOW
+		_trail.amount = 120 if flow == FlowSystem.Flow.DEEP_FLOW else (60 if flow == FlowSystem.Flow.FLOW else 0)
+	if _ambient != null:
+		_ambient.emitting = flow == FlowSystem.Flow.DEEP_FLOW
+	var glow := _env_glow_base
+	var ambient := _env_ambient_base
+	match flow:
+		FlowSystem.Flow.FLOW:
+			glow = _env_glow_base + 0.15
+			ambient = _env_ambient_base + 0.06
+		FlowSystem.Flow.DEEP_FLOW:
+			glow = _env_glow_base + 0.3
+			ambient = _env_ambient_base + 0.1
+		FlowSystem.Flow.FRACTURED:
+			glow = _env_glow_base + 0.25
+	if _env != null:
+		_env.glow_intensity = glow
+		_env.ambient_light_energy = ambient
+	if _rim_material == null:
+		_find_rim_material()
+	if _rim_material != null:
+		_rim_material.emission_energy_multiplier = 1.2 + (0.8 if flow == FlowSystem.Flow.DEEP_FLOW else 0.0)
+	for node in get_tree().get_nodes_in_group("platform"):
+		var visual := node.get_node_or_null("Visual") as PlatformVisual
+		if visual != null:
+			visual.set_flow_level(flow)
+
+
+func _setup_trail() -> void:
+	var player := get_tree().get_first_node_in_group("player")
+	if player == null:
+		return
+	var visual := (player as Node3D).get_node_or_null("Visual") as Node3D
+	if visual == null:
+		return
+	_trail = CPUParticles3D.new()
+	_trail.name = "InkTrail"
+	_trail.local_coords = false
+	_trail.emitting = false
+	_trail.amount = 60
+	_trail.lifetime = 0.55
+	_trail.direction = Vector3(-1, 0.1, 0)
+	_trail.spread = 30.0
+	_trail.gravity = Vector3(0, -3.0, 0)
+	_trail.initial_velocity_min = 0.2
+	_trail.initial_velocity_max = 1.0
+	_trail.scale_amount_min = 0.06
+	_trail.scale_amount_max = 0.16
+	_trail.color = Color(VisualPalette.NEON_CYAN, 0.5)
+	var quad := QuadMesh.new()
+	quad.size = Vector2(0.2, 0.2)
+	_trail.mesh = quad
+	_trail.emission_shape = CPUParticles3D.EMISSION_SHAPE_SPHERE
+	_trail.emission_sphere_radius = 0.2
+	_trail.position = Vector3(0, 0.7, 0)
+	visual.add_child(_trail)
+
+
+func _setup_ambient() -> void:
+	var vfx := get_node_or_null("../VFX") as Node3D
+	if vfx == null:
+		return
+	_ambient = CPUParticles3D.new()
+	_ambient.name = "FlowAmbient"
+	_ambient.local_coords = false
+	_ambient.emitting = false
+	_ambient.amount = 60
+	_ambient.lifetime = 2.4
+	_ambient.direction = Vector3(0, -0.3, 0)
+	_ambient.spread = 40.0
+	_ambient.gravity = Vector3.ZERO
+	_ambient.initial_velocity_min = 0.1
+	_ambient.initial_velocity_max = 0.5
+	_ambient.scale_amount_min = 0.04
+	_ambient.scale_amount_max = 0.1
+	_ambient.color = Color(VisualPalette.NEON_CYAN, 0.4)
+	var quad := QuadMesh.new()
+	quad.size = Vector2(0.14, 0.14)
+	_ambient.mesh = quad
+	_ambient.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX
+	_ambient.emission_box_extents = Vector3(8.0, 6.0, 1.0)
+	vfx.add_child(_ambient)
+
+
+func _find_rim_material() -> void:
+	var player := get_tree().get_first_node_in_group("player")
+	if player == null:
+		return
+	var rim := (player as Node3D).get_node_or_null("Visual/RimShell") as MeshInstance3D
+	if rim != null:
+		_rim_material = rim.material_override as StandardMaterial3D
 
 
 func _assign_platform_variants() -> void:
@@ -104,6 +218,9 @@ func _setup_environment(env: Environment) -> void:
 		env.set("glow_levels/%d" % level, level == 3 or level == 5)
 
 	env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
+	_env = env
+	_env_glow_base = env.glow_intensity
+	_env_ambient_base = env.ambient_light_energy
 
 
 func _build_background() -> void:

@@ -3,6 +3,7 @@ extends CharacterBody3D
 
 signal jumped
 signal player_died
+signal landed
 
 @export var run_speed: float = 4.0
 @export var gravity: float = 22.0
@@ -17,7 +18,7 @@ const JUMP_QUALITY_NONE := -1
 
 var current_jump_quality: int = JUMP_QUALITY_NONE
 
-var _game_state: int = GameManager.GameState.PLAYING
+var _game_state: int = RunState.State.PLAYING
 var _was_airborne := false
 var _dead := false
 
@@ -30,6 +31,15 @@ func set_game_state(state: int) -> void:
 	_game_state = state
 
 
+func reset_run(start_position: Vector3) -> void:
+	_dead = false
+	_was_airborne = false
+	current_jump_quality = JUMP_QUALITY_NONE
+	_game_state = RunState.State.PLAYING
+	velocity = Vector3.ZERO
+	global_position = start_position
+
+
 func handle_timing_result(result: TimingSystem.TimingResult) -> void:
 	attempt_jump(result)
 
@@ -38,7 +48,7 @@ func attempt_jump(quality: TimingSystem.TimingResult) -> void:
 	if _dead or not is_on_floor():
 		current_jump_quality = JUMP_QUALITY_NONE
 		return
-	if _game_state == GameManager.GameState.GAME_OVER:
+	if _game_state != RunState.State.PLAYING:
 		current_jump_quality = JUMP_QUALITY_NONE
 		return
 	var jump_speed := good_jump_velocity
@@ -72,6 +82,7 @@ func _physics_process(delta: float) -> void:
 
 	if is_on_floor() and _was_airborne:
 		_was_airborne = false
+		emit_signal("landed")
 		if debug_mode:
 			print("Dreamer: landing")
 	elif not is_on_floor():
